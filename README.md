@@ -1,5 +1,6 @@
 ## cafe
 A catfetch :3 utility
+> Note: It's only intended to work on GNU/Linux for now.
 
 ### Install
 ```sh
