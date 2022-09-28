@@ -17,5 +17,5 @@ sudo chmod +x /usr/bin/cafe
 ```
 Tip: pipe to `lolcat` when using this tool
 
-## screenshots
+## Image
 ![image](https://user-images.githubusercontent.com/71683721/192859661-e1d9e7d2-cd94-4dae-a095-2dddff86d5bc.png)
