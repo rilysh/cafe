@@ -24,6 +24,7 @@ has() {
 os=$(lsb_release -ds | sed -n 's/PRETTY_NAME=//p' /etc/os-release | sed -E 's/["",]//g')
 kernel_ver=$(uname -r)
 wm=${WAYLAND_DISPLAY:-$(xprop -id "$(xprop -root _NET_SUPPORTING_WM_CHECK | cut -d' ' -f5)" _NET_WM_NAME | cut -d'"' -f2)}
+[ -z $wm ] && wm="none"
 uptime=$(uptime -p | sed "s/up[[:space:]]//g")
 user=$(id -u -n) # Instead using $USER variable which can be overwrite
 host=$(uname -n) # Same like user variable, it also can be overwrite
