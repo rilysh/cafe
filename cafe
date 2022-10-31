@@ -21,7 +21,7 @@ has() {
 
 # Optionally you can bare to execute 2 different commands, as awk is harder, so... 
 # awk -F: "NR==2{print $1}" /etc/os-release | sed -E 's/PRETTY_NAME=//' | sed -E 's/["",]//g'
-os=$(lsb_release -ds | sed -n 's/PRETTY_NAME=//p' /etc/os-release | sed -E 's/["",]//g')
+os=$(sed -n 's/PRETTY_NAME=//p' /etc/os-release | sed -E 's/["",]//g')
 kernel_ver=$(uname -r)
 wm=${WAYLAND_DISPLAY:-$(xprop -id "$(xprop -root _NET_SUPPORTING_WM_CHECK | cut -d' ' -f5)" _NET_WM_NAME | cut -d'"' -f2)}
 [ -z $wm ] && wm="none"
