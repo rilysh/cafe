@@ -21,7 +21,7 @@ has() {
 
 # Optionally you can execute 2 different commands, to get distro name, however, awk is hard, so... 
 # awk -F: "NR==2{print $1}" /etc/os-release | sed -E 's/PRETTY_NAME=//' | sed -E 's/["",]//g'
-os=$(sed -n 's/PRETTY_NAME=//p' /etc/os-release | sed -E 's/["",]//g')
+os=$(sed -n "s/PRETTY_NAME=//p" /etc/os-release | tr -d '"')
 kernel_ver=$(uname -r)
 wm=${WAYLAND_DISPLAY:-$(xprop -id "$(xprop -root _NET_SUPPORTING_WM_CHECK | cut -d' ' -f5)" _NET_WM_NAME | cut -d'"' -f2)}
 [ -z $wm ] && wm="none"
