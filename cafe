@@ -19,6 +19,8 @@ has() {
     [ -x "$_cmd" ] || return 1
 }
 
+# TODO: A better solution
+[ ! -x "$(command -v xprop)" ] && echo "To get WM info, please install xprop" && exit
 # Optionally you can execute 2 different commands, to get distro name, however, awk is hard, so... 
 # awk -F: "NR==2{print $1}" /etc/os-release | sed -E 's/PRETTY_NAME=//' | sed -E 's/["",]//g'
 os=$(sed -n "s/PRETTY_NAME=//p" /etc/os-release | tr -d '"')
