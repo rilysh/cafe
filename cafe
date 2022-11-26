@@ -28,6 +28,7 @@ wm=${WAYLAND_DISPLAY:-$(xprop -id "$(xprop -root _NET_SUPPORTING_WM_CHECK | cut 
 uptime=$(uptime -p | sed "s/up[[:space:]]//g")
 user=$(id -u -n) # Instead using $USER variable which can be overwrite
 host=$(uname -n) # Same like user variable, it also can be overwrite
+loadavg=$(cat /proc/loadavg | awk '{print $1, $2, $3}')
 pkgs=$(
     case $(uname -s) in
         (Linux*)
@@ -95,5 +96,6 @@ echo -ne "
    $color_logo( | | )$color_end      $color_info shell: ${SHELL##*/}$color_end
   $color_logo(__d b__)$color_end     $color_info pkgs: $pkgs$color_end
                 $color_info uptime: $uptime$color_end
+                $color_info loadavg: $loadavg$color_end
 
 "
