@@ -25,7 +25,7 @@ has() {
 # awk -F: "NR==2{print $1}" /etc/os-release | sed -E 's/PRETTY_NAME=//' | sed -E 's/["",]//g'
 os=$(sed -n "s/PRETTY_NAME=//p" /etc/os-release | tr -d '"')
 kernel_ver=$(uname -r)
-wm=${WAYLAND_DISPLAY:-$(xprop -id "$(xprop -root _NET_SUPPORTING_WM_CHECK | cut -d' ' -f5)" _NET_WM_NAME | cut -d'"' -f2)}
+wm=${WAYLAND_DISPLAY:-$(xprop -id "$(xprop -root _NET_SUPPORTING_WM_CHECK 2>/dev/null | cut -d' ' -f5)" _NET_WM_NAME 2>/dev/null | cut -d'"' -f2)}
 [ -z $wm ] && wm="none"
 uptime=$(uptime -p | sed "s/up[[:space:]]//g")
 user=$(id -u -n) # Instead using $USER variable which can be overwrite
