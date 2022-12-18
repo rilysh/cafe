@@ -1,6 +1,5 @@
 ## cafe
-A catfetch :3 utility
-> Note: It's only intended to work on GNU/Linux for now.
+A catfetch :3 utility for your GNU/Linux distro
 
 ### Install
 ```sh
@@ -11,15 +10,21 @@ sudo chmod +x /usr/bin/cafe
 ```
 ### Usage
 ```
-[-ra] - random ansi color
-[-rb] - random bold color
-[-b] - blink
-[-h] - help menu (this one)
+Usage: cafe command (optional)
+
+Commands:
+    -ra     - random ansi color
+    -rb     - random bold color
+    -b      - blink
+    -h      - help menu (this one)
+
 ```
 Tip: pipe to `lolcat` when using this tool
 
-## Image
-![image](https://user-images.githubusercontent.com/71683721/192859661-e1d9e7d2-cd94-4dae-a095-2dddff86d5bc.png)
+### Images
+[![2022-12-18-13-02.png](https://i.postimg.cc/25qD17x9/2022-12-18-13-02.png)](https://postimg.cc/hJqwwx6V)
+[![2022-12-18-13-03.png](https://i.postimg.cc/PxkRdWVw/2022-12-18-13-03.png)](https://postimg.cc/B8MggK0S)
 
-## Thanks
-[jhx](https://github.com/jhx0) - For adding loadavg support
+### Thanks
+[jhx](https://github.com/jhx0), for adding loadavg support\
+[benjamin](https://github.com/benjaminfretez), for fixing a bug with WM command
