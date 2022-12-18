@@ -3,15 +3,15 @@
 
 help() {
     echo "
-cafe - catfetch utility
+cafe v1.1
+Usage: cafe command (optional)
 
-usage
------
-[-ra] - random ansi color
-[-rb] - random bold color
-[-b] - blink
-[-h] - help menu (this one)
-"
+Commands:
+    -ra     - random ansi color
+    -rb     - random bold color
+    -b      - blink
+    -h      - help menu (this one)
+    "
 }
 
 has() {
@@ -19,69 +19,62 @@ has() {
     [ -x "$_cmd" ] || return 1
 }
 
-# TODO: A better solution
-[ ! -x "$(command -v xprop)" ] && echo "To get WM info, please install xprop" && exit
-# Optionally you can execute 2 different commands, to get distro name, however, awk is hard, so... 
-# awk -F: "NR==2{print $1}" /etc/os-release | sed -E 's/PRETTY_NAME=//' | sed -E 's/["",]//g'
+! has xprop && echo "To get WM info, please install xprop" && exit
+
+# Command variables
 os=$(sed -n "s/PRETTY_NAME=//p" /etc/os-release | tr -d '"')
 kernel_ver=$(uname -r)
 wm=${WAYLAND_DISPLAY:-$(xprop -id "$(xprop -root _NET_SUPPORTING_WM_CHECK 2>/dev/null | cut -d' ' -f5)" _NET_WM_NAME 2>/dev/null | cut -d'"' -f2)}
-[ -z $wm ] && wm="none"
 uptime=$(uptime -p | sed "s/up[[:space:]]//g")
-user=$(id -u -n) # Instead using $USER variable which can be overwrite
-host=$(uname -n) # Same like user variable, it also can be overwrite
+user=$(id -u -n)
+host=$(uname -n)
 loadavg=$(cat /proc/loadavg | awk '{print $1, $2, $3}')
 pkgs=$(
-    case $(uname -s) in
-        (Linux*)
-            has dpkg && dpkg-query -W
-            has xbps-query && xbps-query -l
-            has pacman-key && pacman -Qq
-            has rpm && rpm -qa
-            has dnf && dnf list installed
-            has apk && apk info
-            has guix && guix package --list-installed
-            has opkg && opkg list-installed
-            has crux && pkginfo -i
-            has emerge && printf "%s\n" /var/db/pkg/*/*/
-            has brew && printf "%s\n" "$(brew --cellar)/"*
-            has pkgtool && printf "%s\n" /var/log/packages/*
-            has eopkg && printf "%s\n" /var/lib/eopkg/package/*
-            has nix-store && {
-                [ -d "/run/current-system/sw" ] && nix-store -q --requisites /run/current-system/sw
-                nix-store -q --requisites ~/.nix-profile
-            }
-        ;;
-        (*)
-            # 0 pkgs
-        ;;
-    esac | wc -l
+    has dpkg        && dpkg-query -W | wc -l
+    has xbps-query  && xbps-query -l | wc -l
+    has pacman-key  && pacman -Qq | wc -l
+    has rpm         && rpm -qa | wc -l
+    has dnf         && dnf list installed | wc -l
+    has apk         && apk info | wc -l
+    has guix        && guix package --list-installed | wc -l
+    has opkg        && opkg list-installed | wc -l
+    has crux        && pkginfo -i | wc -l
+    has emerge      && printf "%s\n" /var/db/pkg/*/*/ | wc -l
+    has brew        && printf "%s\n" "$(brew --cellar)/"* | wc -l
+    has pkgtool     && printf "%s\n" /var/log/packages/* | wc -l
+    has eopkg       && printf "%s\n" /var/lib/eopkg/package/* | wc -l
+    has nix-store   && {
+        [ -d "/run/current-system/sw" ] && nix-store -q --requisites /run/current-system/sw
+        nix-store -q --requisites ~/.nix-profile
+    } | wc -l
 )
-bar_len=${#host}+${#user}+1
+shuff=$(shuf -i 31-38 -n 1)
+[ -z $wm ] && wm="none"
+
+# Get your hostname and username length (for padding increase one more time) and increase the bar to fit
 bar=$(
-    for ((i = 0; i < $bar_len; i++)); do
+    for ((i = 0; i < ${#host}+${#user}+1; i++)); do
         echo -n "-";
     done
 )
-color_head=
-color_logo=
-color_info=
-color_end="\033[0m"
-case $1 in
+
+# Take arguments and print accordingly
+end="\033[0m"
+case "$1" in
     (-ra)
-        color_head="\033[0;$(shuf -i 31-38 -n 1)m"
-        color_logo="\033[0;$(shuf -i 31-38 -n 1)m"
-        color_info="\033[0;$(shuf -i 31-38 -n 1)m"
+        head="\033[0;${shuff}m"
+        logo="\033[0;${shuff}m"
+        info="\033[0;${shuff}m"
     ;;
     (-rb)
-        color_head="\033[1;$(shuf -i 31-38 -n 1)m"
-        color_logo="\033[1;$(shuf -i 31-38 -n 1)m"
-        color_info="\033[1;$(shuf -i 31-38 -n 1)m"
+        head="\033[1;${shuff}m"
+        logo="\033[1;${shuff}m"
+        info="\033[1;${shuff}m"
     ;;
     (-b)
-        color_head="\033[1;5m"
-        color_logo="\033[1;5m"
-        color_info="\033[1;5m"
+        head="\033[1;5m"
+        logo="\033[1;5m"
+        info="\033[1;5m"
     ;;
     (-h)
         help
@@ -89,15 +82,16 @@ case $1 in
     ;;
 esac
 
+# Print all gathered information
 echo -ne "
-                 $color_head$user@$host$color_end
-                 $color_head$bar$color_end
-    $color_logo/\_/\  ($color_end    $color_info os: $os$color_end
-   $color_logo( ^.^ ) _)$color_end   $color_info kernel: $kernel_ver$color_end
-     $color_logo/|\ ($color_end      $color_info wm: $wm$color_end
-   $color_logo( | | )$color_end      $color_info shell: ${SHELL##*/}$color_end
-  $color_logo(__d b__)$color_end     $color_info pkgs: $pkgs$color_end
-                $color_info uptime: $uptime$color_end
-                $color_info loadavg: $loadavg$color_end
+                 $color_head$user@$host$end
+                 $color_head$bar$end
+    $logo/\_/\  ($end    $info os: $os$end
+   $logo( ^.^ ) _)$end   $info kernel: $kernel_ver$end
+     $logo/|\ ($end      $info wm: $wm$end
+   $logo( | | )$end      $info shell: ${SHELL##*/}$end
+  $logo(__d b__)$end     $info pkgs: $pkgs$end
+                $info uptime: $uptime$end
+                $info loadavg: $loadavg$end
 
 "
