@@ -3,7 +3,7 @@
 
 help() {
     cat << EOF
-cafe v1.2
+cafe v1.2.1
 Usage: cafe command (optional)
 
 Usage:
@@ -15,13 +15,16 @@ EOF
 }
 
 has() {
-    _cmd=$(command -v "$1") 2>/dev/null || return 1
-    [ -x "$_cmd" ] || return 1
+    command -v "$1" >/dev/null 2>&1
+}
+
+shuff(){
+	shuf -i 31-38 -n 1
 }
 
 main() {
     ! has xprop && {
-        echo "To get WM info, please install xprop"
+        echo "To get WM info, please install xprop" >&2
         exit 1
     }
     # Command variables
@@ -32,26 +35,26 @@ main() {
     user=$(id -u -n)
     host=$(uname -n)
     loadavg=$(awk '{print $1, $2, $3}' /proc/loadavg)
-    pkgs=$(
-        has dpkg        && dpkg-query -W | wc -l
-        has xbps-query  && xbps-query -l | wc -l
-        has pacman-key  && pacman -Qq | wc -l
-        has rpm         && rpm -qa | wc -l
-        has dnf         && dnf list installed | wc -l
-        has apk         && apk info | wc -l
-        has guix        && guix package --list-installed | wc -l
-        has opkg        && opkg list-installed | wc -l
-        has crux        && pkginfo -i | wc -l
-        has emerge      && printf "%s\n" /var/db/pkg/*/*/ | wc -l
-        has brew        && printf "%s\n" "$(brew --cellar)/"* | wc -l
-        has pkgtool     && printf "%s\n" /var/log/packages/* | wc -l
-        has eopkg       && printf "%s\n" /var/lib/eopkg/package/* | wc -l
+    pkgs=$({
+        has dpkg        && dpkg-query -W
+        has xbps-query  && xbps-query -l
+        has pacman-key  && pacman -Qq
+        has rpm         && rpm -qa
+        has dnf         && dnf list installed
+        has apk         && apk info
+        has guix        && guix package --list-installed
+        has opkg        && opkg list-installed
+        has crux        && pkginfo -i
+        has emerge      && printf "%s\n" /var/db/pkg/*/*/
+        has brew        && printf "%s\n" "$(brew --cellar)/"*
+        has pkgtool     && printf "%s\n" /var/log/packages/*
+        has eopkg       && printf "%s\n" /var/lib/eopkg/package/*
         has nix-store   && {
             [ -d "/run/current-system/sw" ] && nix-store -q --requisites /run/current-system/sw
             nix-store -q --requisites ~/.nix-profile
-        } | wc -l
+        }
+	} | wc -l
     )
-    shuff=$(shuf -i 31-38 -n 1)
     [ -z "$wm" ] && wm="none"
 
     # Get your hostname and username length (for padding increase one more time) and increase the bar to fit
@@ -65,14 +68,14 @@ main() {
     end="\033[0m"
     case "$1" in
         (-ra)
-            head="\033[0;${shuff}m"
-            logo="\033[0;${shuff}m"
-            info="\033[0;${shuff}m"
+			head="\033[0;$(shuff)m"
+			logo="\033[0;$(shuff)m"
+			info="\033[0;$(shuff)m"
         ;;
         (-rb)
-            head="\033[1;${shuff}m"
-            logo="\033[1;${shuff}m"
-            info="\033[1;${shuff}m"
+			head="\033[1;$(shuff)m"
+			logo="\033[1;$(shuff)m"
+			info="\033[1;$(shuff)m"
         ;;
         (-b)
             head="\033[1;5m"
